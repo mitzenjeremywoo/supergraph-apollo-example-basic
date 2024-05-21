@@ -3,56 +3,75 @@ import { startStandaloneServer } from '@apollo/server/standalone'
 import gql from 'graphql-tag';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
-// const typeDefs = `#graphql
-//   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
-//   # This "Book" type defines the queryable fields for every book in our data source.
-//   type Book {
-//     title: String
-//     author: String
-//   }
-
-//   # The "Query" type is special: it lists all of the available queries that
-//   # clients can execute, along with the return type for each. In this
-//   # case, the "books" query returns an array of zero or more Books (defined above).
-//   type Query {
-//     books: [Book]
-//   }
-// `;
-
 const books = [
   {
+    id: "1",
     title: 'The Awakening',
     author: 'Kate Chopin',
+    review: {
+      id: 1
+    }
   },
   {
+    id: "2",
     title: 'City of Glass',
     author: 'Paul Auster',
+    review: { 
+      id: 2
+    }
   },
+  {
+    id: "3",
+    title: 'City of Angels',
+    author: 'Paul Auster',
+    review: { 
+      id: 3
+    }
+  },
+];
+
+const bookReviews = [
+  {  
+    id: 1
+   },
+  {    
+      id: 2
+  },
+  {    
+    id: 3
+  }
 ];
 
 const typeDefs = gql`
 
   extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key"])
 
-  type Book {
+  type Book @key(fields: "id") {
+    id: ID!
     title: String
     author: String
   }
 
   type Query {
     books: [Book]
+    book(id: ID!): Book
   }
 `;
+
+// extend type BookReview @key(fields: "id", resolvable: false) {
+//   id: ID!
+// }
 
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
     books: () => books,
+    // (parent, args, context, info)
+    book: (a, { id }, c) => {  
+       return books.filter(x => x.id == id)[0];
+    }
+    //bookReviews: () => bookReviews
   },
 };
 
