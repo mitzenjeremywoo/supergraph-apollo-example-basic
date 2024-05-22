@@ -49,8 +49,7 @@ const typeDefs = gql`
 //   id: ID!
 // }
 
-// Resolvers define the technique for fetching the types defined in the
-// schema. This resolver retrieves books from the "books" array above.
+
 const resolvers = {
   Query: {
     books: () => {
@@ -88,10 +87,6 @@ const server = new ApolloServer({
   schema: buildSubgraphSchema({ typeDefs, resolvers }),
 });
 
-// Passing an ApolloServer instance to the `startStandaloneServer` function:
-//  1. creates an Express app
-//  2. installs your ApolloServer instance as middleware
-//  3. prepares your app to handle incoming requests
 const { url } = await startStandaloneServer(server, { listen: { port: 4001 } });
 
 console.log(`🚀 Server listening at: ${url}`);
