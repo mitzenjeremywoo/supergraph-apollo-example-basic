@@ -57,12 +57,11 @@ const resolvers = {
       console.log(id);
       return bookReviews.filter(x => x.id == id)[0];
    },
-  },
-  
+  },  
   BookReview: {
     __resolveReference(review) {
       console.log("reviews subgraphs - bookreview resolving types.", review);
-      return { id: review.id, comment: 'Alice' };
+      return bookReviews.filter(x => x.id == review.id)[0]; // { id: review.id, comment: 'Alice' };
     }
    }
   //},
