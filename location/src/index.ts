@@ -49,7 +49,6 @@ const typeDefs = gql`
 //   id: ID!
 // }
 
-
 const resolvers = {
   Query: {
     books: () => {
@@ -65,22 +64,10 @@ const resolvers = {
   },
   Book: {
     reviews(book) { 
-      console.log('next step goes to resolving book', book);
+      console.log('Query -> returns Book type. This gets resolved here. And given that it also has BookReview type, this get resolve in review subgraph', book);
       return { __typename: 'BookReview', id: book.reviews.id };
     }
-  },
-  BookReview: {
-      // this reference resolver is optional - Apollo Server provides it for us by default
-      // __resolveReference(referencedLocation) {
-      //   console.log(' referenced locations');
-      //   console.log(referencedLocation);
-      //   return referencedLocation;
-      // },
-      reviews(reviews) {
-        console.log(reviews);
-        return  { __typename: 'BookReview', id: reviews.id };
-     }
-    }
+  }
 };
 
 const server = new ApolloServer({
