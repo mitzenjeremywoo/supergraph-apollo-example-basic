@@ -20,15 +20,15 @@ const typeDefs = gql`
 const bookReviews = [
   {
     id: "1",
-    comment: 'The Awakening is a very good book'
+    comment: 'The Awakening is a very good book. Good stuff.'
   },
   {
     id: "2",
-    comment: 'City of Glass is an excellent read'
+    comment: 'City of Glass is an excellent read. Good read.'
   },
   {
     id: "3",
-    comment: 'turbulence times is a good book of our times'
+    comment: 'turbulence times is a good book of our times. Demo comment'
   },
   {
     id: "4",
@@ -59,7 +59,7 @@ const resolvers = {
   BookReview: {
     __resolveReference(review) {
       console.log("reviews subgraphs - bookreview resolving types.", review);
-      return bookReviews.filter(x => x.id == review.id)[0]; // { id: review.id, comment: 'Alice' };
+      return bookReviews.filter(x => x.id == review.id)[0];
     }
    } 
 };

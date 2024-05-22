@@ -62,12 +62,13 @@ const resolvers = {
       return books.filter(x => x.id == id)[0];
     },
   },
-  Book: {
-    reviews(book) { 
-      console.log('Query -> returns Book type. This gets resolved here. And given that it also has BookReview type, this get resolve in review subgraph', book);
-      return { __typename: 'BookReview', id: book.reviews.id };
-    }
-  }
+  // We don't really need this.
+  // Book: {
+  //   reviews1(book) { 
+  //     console.log('Query -> returns Book type. This gets resolved here. And given that it also has BookReview type, this get resolve in review subgraph', book);
+  //     return { __typename: 'BookReview', id: book.reviews.id };
+  //   }
+  // }
 };
 
 const server = new ApolloServer({
