@@ -3,18 +3,15 @@ import { startStandaloneServer } from '@apollo/server/standalone'
 import gql from 'graphql-tag';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
 const typeDefs = gql`
 
-  extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key"])
+  extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@shareable"])
 
-  type BookReview {
-    title: String
-    author: String
+  type BookReview @key(fields: "id") @shareable {
+    id: ID!
+    comment: String
   }
-
+  
   type Query {
     reviews: [BookReview]
   }
@@ -22,12 +19,32 @@ const typeDefs = gql`
 
 const bookReviews = [
   {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
+    id: "1",
+    comment: 'The Awakening is a very good book'
   },
   {
-    title: 'City of Glass',
-    author: 'Paul Auster',
+    id: "2",
+    comment: 'City of Glass is an excellent read'
+  },
+  {
+    id: "3",
+    comment: 'turbulence times is a good book of our times'
+  },
+  {
+    id: "4",
+    comment: 'you will never walk alone'
+  },
+  {
+    id: "100",
+    comment: 'you will never walk alone'
+  },
+  {
+    id: "200",
+    comment: 'you will never walk alone'
+  },
+  {
+    id: "300",
+    comment: 'you will never walk alone'
   },
 ];
 
@@ -36,7 +53,34 @@ const bookReviews = [
 const resolvers = {
   Query: {
     reviews: () => bookReviews,
+    reviewBy: (a, { id }, c) => {  
+      console.log(id);
+      return bookReviews.filter(x => x.id == id)[0];
+   },
   },
+  
+  BookReview: {
+    __resolveReference(review) {
+      console.log("reviews subgraphs - bookreview resolving types.", review);
+      return { id: review.id, comment: 'Alice' };
+    }
+   }
+  //},
+  // Reviews: {
+  //   __resolveReference(id) {
+  //     console.log(id);
+  //     return {id: "99", comment: "back for good"}
+  //   } 
+  // Book: {
+  //   // this reference resolver is optional - Apollo Server provides it for us by default
+  //   __resolveReference(referencedLocation) {
+  //     return referencedLocation;
+  //   },
+  //   overallRating: ({id}, _, {dataSources}) => {
+  //     console.log('overall ratings', id);
+  //     //return dataSources.reviewsAPI.getOverallRatingForLocation(id);
+  //   },
+  // }
 };
 
 // The ApolloServer constructor requires two parameters: your schema

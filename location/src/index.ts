@@ -8,48 +8,35 @@ const books = [
     id: "1",
     title: 'The Awakening',
     author: 'Kate Chopin',
-    review: {
-      id: 1
-    }
+    reviews: {id: "1"}
   },
   {
     id: "2",
     title: 'City of Glass',
     author: 'Paul Auster',
-    review: { 
-      id: 2
-    }
+    reviews: {id: "2"}
   },
   {
     id: "3",
     title: 'City of Angels',
     author: 'Paul Auster',
-    review: { 
-      id: 3
-    }
+    reviews: {id: "3"}
   },
-];
-
-const bookReviews = [
-  {  
-    id: 1
-   },
-  {    
-      id: 2
-  },
-  {    
-    id: 3
-  }
 ];
 
 const typeDefs = gql`
 
-  extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key"])
+  extend schema @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key", "@external"])
 
   type Book @key(fields: "id") {
     id: ID!
     title: String
     author: String
+    reviews: BookReview
+  }
+
+  extend type BookReview @key(fields: "id") {
+    id: ID! @external
   }
 
   type Query {
@@ -66,21 +53,36 @@ const typeDefs = gql`
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
-    books: () => books,
+    books: () => {
+      console.log('books all');
+      console.log(books);
+      return books
+    },
     // (parent, args, context, info)
     book: (a, { id }, c) => {  
-       return books.filter(x => x.id == id)[0];
-    }
-    //bookReviews: () => bookReviews
+      console.log('books single');
+      return books.filter(x => x.id == id)[0];
+    },
   },
+  Book: {
+    reviews(book) { 
+      console.log('next step goes to resolving book', book);
+      return { __typename: 'BookReview', id: book.reviews.id };
+    }
+  },
+  BookReview: {
+      // this reference resolver is optional - Apollo Server provides it for us by default
+      // __resolveReference(referencedLocation) {
+      //   console.log(' referenced locations');
+      //   console.log(referencedLocation);
+      //   return referencedLocation;
+      // },
+      reviews(reviews) {
+        console.log(reviews);
+        return  { __typename: 'BookReview', id: reviews.id };
+     }
+    }
 };
-
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
-// const server = new ApolloServer({
-//   typeDefs,
-//   resolvers,
-// });
 
 const server = new ApolloServer({
   schema: buildSubgraphSchema({ typeDefs, resolvers }),
